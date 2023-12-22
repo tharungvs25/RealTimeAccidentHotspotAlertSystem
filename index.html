@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Real Time Hotspot Alert System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Mapbox CSS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Mapbox JS -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <!-- Sound JS -->
+  <script src="electric-hum-141075.mp3"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+
+    nav {
+      background-color: #333;
+    }
+
+    .navbar-dark .navbar-toggler-icon {
+      background-color: #f2f2f2;
+    }
+
+    nav a {
+      color: #f2f2f2;
+    }
+
+    #map {
+      position: absolute;
+      top: 56px; /* Add 20 pixels of empty space from the top */
+      bottom: 0;
+      width: 100%;
+    }
+
+    .features-section {
+      display: none;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Real Time Hotspot Alert System</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="index.html">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Features
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addAreaModal">Add Accident Prone Area</a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#removeAreaModal">Remove Accident Prone Area</a></li>
+              <li><a class="dropdown-item" href="check.html">Check Accident Prone Area</a></li>
+              <li><a class="dropdown-item list-accident-prone" href="list.html">List of Accident Prone Area</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="map"></div>
+
+  <div class="features-section" id="featuresSection">
+    <h2>Features</h2>
+    <ul>
+      <li><a class="add-accident-area" href="#" data-bs-toggle="modal" data-bs-target="#addAreaModal">Add Accident Prone Area</a></li>
+      <li><a class="remove-accident-area" href="#" data-bs-toggle="modal" data-bs-target="#removeAreaModal">Remove Accident Prone Area</a></li>
+      <li><a class="check-accident-area" href="#">Check Accident Prone Area</a></li>
+      <li><a class="list-accident-prone" href="list.html">List of Accident Prone Area</a></li>
+    </ul>
+  </div>
+
+  <!-- Add Accident Prone Area Modal -->
+  <div class="modal fade" id="addAreaModal" tabindex="-1" aria-labelledby="addAreaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAreaModalLabel">Add Accident Prone Area</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAreaForm">
+            <div class="mb-3">
+              <label for="addLatitude" class="form-label">Latitude:</label>
+              <input type="text" class="form-control" id="addLatitude" placeholder="Enter latitude">
+            </div>
+            <div class="mb-3">
+              <label for="addLongitude" class="form-label">Longitude:</label>
+              <input type="text" class="form-control" id="addLongitude" placeholder="Enter longitude">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addArea()">Submit</button>
+          
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove Accident Prone Area Modal -->
+  <div class="modal fade" id="removeAreaModal" tabindex="-1" aria-labelledby="removeAreaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="removeAreaModalLabel">Remove Accident Prone Area</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="removeAreaForm">
+            <div class="mb-3">
+              <label for="removeLatitude" class="form-label">Latitude:</label>
+              <input type="text" class="form-control" id="removeLatitude" placeholder="Enter latitude">
+            </div>
+            <div class="mb-3">
+              <label for="removeLongitude" class="form-label">Longitude:</label>
+              <input type="text" class="form-control" id="removeLongitude" placeholder="Enter longitude">
+            </div>
+            <button type="button" class="btn btn-danger" onclick="removeArea()">Remove</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Check Accident Prone Area Modal -->
+  <div class="modal fade" id="addAreaModal" tabindex="-1" aria-labelledby="addAreaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAreaModalLabel">Check Accident Prone Area</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAreaForm">
+            <div class="mb-3">
+              <label for="addLatitude" class="form-label">Latitude:</label>
+              <input type="text" class="form-control" id="addLatitude" placeholder="Enter latitude">
+            </div>
+            <div class="mb-3">
+              <label for="addLongitude" class="form-label">Longitude:</label>
+              <input type="text" class="form-control" id="addLongitude" placeholder="Enter longitude">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addArea()">GO</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="config.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+
+<script>
+  mapboxgl.accessToken = API_TOKEN;
+  if (!mapboxgl.supported()) {
+    alert('Your browser does not support Mapbox GL');
+  } else {
+    let map;
+    const markers = [];
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    oscillator.connect(audioContext.destination);
+
+    navigator.geolocation.getCurrentPosition(success, error);
+
+    async function getAccidentProneLocations() {
+        try {
+            const response = await fetch('latlon.txt');
+            const data = await response.text();
+            const locations = data
+                .trim()
+                .split('\n')
+                .map(line => line.split(',').map(Number));
+
+            return locations;
+        } catch (error) {
+            console.error('Error fetching accident-prone locations:', error);
+            return [];
+        }
+    }
+
+    function success(position) {
+        const { longitude, latitude } = position.coords;
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [longitude, latitude],
+            zoom: 9
+        });
+
+        const userMarker = new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+
+        getAccidentProneLocations().then(accidentProneLocations => {
+            markers.push(userMarker);
+
+            function showAccidentProneLocations() {
+                accidentProneLocations.forEach(location => {
+                    const distance = calculateDistance(latitude, longitude, location[1], location[0]);
+
+                    // Show locations within 5km radius
+                    if (distance <= 5) {
+                        const accidentProneMarker = new mapboxgl.Marker({ color: "red" })
+                            .setLngLat(location)
+                            .addTo(map);
+                        markers.push(accidentProneMarker);
+                    }
+
+                    // Play sound for locations within 500 meters
+                    if (distance <= 0.5) {
+                        playSound();
+                    }
+                });
+            }
+
+            // Show accident-prone locations on page load
+            showAccidentProneLocations();
+
+            // Event listener for the "List of Accident Prone Area" dropdown item
+            document.querySelector('.list-accident-prone').addEventListener('click', showAccidentProneLocations);
+          window.addArea = async function () {
+            const addLatitude = document.getElementById('addLatitude').value;
+            const addLongitude = document.getElementById('addLongitude').value;
+            const newLocation = [parseFloat(addLongitude), parseFloat(addLatitude)];
+
+            // Add the new location to the accidentProneLocations array
+            accidentProneLocations.push(newLocation);
+
+            // Update the latlon.txt file with the new location
+            const updatedLocations = accidentProneLocations.map(location => location.join(',')).join('\n');
+            await fetch('latlon.txt', {
+              method: 'PUT',
+              body: updatedLocations,
+              headers: {
+                'Content-Type': 'text/plain'
+              }
+            });
+
+            // Show the new accident-prone location on the map
+            const newMarker = new mapboxgl.Marker({ color: "red" })
+              .setLngLat(newLocation)
+              .addTo(map);
+            markers.push(newMarker);
+          };
+        });
+    }
+     
+    function playSound() {
+        oscillator.start();
+
+        // Stop the oscillator after 10 seconds
+        setTimeout(function () {
+            oscillator.stop();
+        }, 10000000);
+    }
+
+    function error() {
+        alert('Unable to retrieve your location');
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Distance in km
+        return distance;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+  }
+
+  
+</script>
+
+<!-- ... (remaining HTML code) ... -->
+</body>
+</html>
